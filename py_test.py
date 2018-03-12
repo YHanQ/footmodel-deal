@@ -2,6 +2,7 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial import ConvexHull
 
 
 def get_vertex(file_path):
@@ -14,6 +15,35 @@ def get_vertex(file_path):
     vertex = np.array(vertex)
     f.close()
     return vertex
+
+
+def convexhull(points):
+    if points is None:
+        return None
+    cv = ConvexHull(points)
+    res_pointlist = []
+    for i in cv.vertices:
+        point = points[i]
+        res_pointlist.append(point)
+    return res_pointlist
+
+
+def cal_dis(points):
+    if points is None:
+        return None
+    dis = 0
+    for i in range(len(points)-1):
+        dis += np.sqrt(np.sum(np.square(points[i]-points[i+1])))
+    return dis
+
+
+def cal_centroid(points):
+    if points is None:
+        return None
+    res = [0, 0]
+    for i in points:
+        res += i
+    return res/len(points)
 
 
 class Plane:
@@ -33,12 +63,13 @@ class Plane:
         return plane_vertex
 
 
-v = get_vertex("model/nor3.obj")
-p1 = Plane(.01, .01, .01, 0.01)
-v1 = p1.get_plane_points(v, rel=0.005)
-fig = plt.figure()
-ax = fig.add_subplot(121,projection='3d')
-bx = fig.add_subplot(122)
-ax.scatter(v1[:,0], v1[:,1],v1[:,2])
-bx.scatter(v[:,0], v[:,1])
-plt.show()
+if __name__ == '__main__':
+    v = get_vertex("model/nor3.obj")
+    p1 = Plane(.0, .0, 1, 0.02)
+    v1 = p1.get_plane_points(v, rel=0.005)
+    fig = plt.figure()
+    ax = fig.add_subplot(121,projection='3d')
+    bx = fig.add_subplot(122)
+    ax.scatter(v1[:,0], v1[:,1],v1[:,2])
+    bx.scatter(v[:,0], v[:,1])
+    plt.show()
